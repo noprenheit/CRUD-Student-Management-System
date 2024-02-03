@@ -1,22 +1,10 @@
+import React from 'react';
+import { StyleSheet, View, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-
+import Create from './CRUD/create';
 
 export default function App() {
     return (
-        <View style={styles.container}>
-            <Text>ikt205 losturcos are going to make an work schedule/tracker app. our experienced and talented developer team are ready and eager for this challenge</Text>
-            <StatusBar style="auto" />
-        </View>
-
+        <Create />
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-});
