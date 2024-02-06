@@ -1,7 +1,7 @@
 import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
 import React, { useState } from 'react';
 import { addDoc, collection } from 'firebase/firestore';
-import { FIREBASE_DB } from './firebaseConfig'; //import firebase
+import { FIREBASE_DB } from './firebaseConfig';
 
 const Create = () => {
     const [classID, setClassID] = useState('');
@@ -90,7 +90,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         backgroundColor: '#E6FFE6',
         flex: 1,
-        justifyContent: 'center',
     },
     form: {
         marginVertical: 20,
