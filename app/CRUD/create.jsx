@@ -13,7 +13,7 @@ const Create = () => {
 
     const addStudent = async () => {
         try {
-            const docRef = await addDoc(collection(FIREBASE_DB, 'Student'), { //Change here for different collection
+            const docRef = await addDoc(collection(FIREBASE_DB, 'Students'), { //Change here for different collection
                 classID: classID,
                 fName: fName,
                 lName: lName,
@@ -118,3 +118,5 @@ const styles = StyleSheet.create({
 });
 
 export default Create; //export for possible future imports
+
+

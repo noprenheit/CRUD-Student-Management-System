@@ -1,73 +1,89 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { DataTable, Searchbar } from 'react-native-paper';
 import { collection, getDocs } from 'firebase/firestore';
 import { FIREBASE_DB } from './firebaseConfig';
 
-const Read = () => {
+export default function Read() {
     const [students, setStudents] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         const fetchStudents = async () => {
             try {
-                const studentsRef = collection(FIREBASE_DB, 'Student');
+                const studentsRef = collection(FIREBASE_DB, 'Students');
                 const querySnapshot = await getDocs(studentsRef);
-                const studentData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+                const studentData = querySnapshot.docs.flatMap((doc) => {
+                    const data = doc.data();
+                    const classes = data.Classes || {};
+
+                    return Object.keys(classes).map((className) => ({
+                        id: doc.id,
+                        firstName: data.FirstName,
+                        lastName: data.LastName,
+                        dob: data.DOB,
+                        className: className,
+                        score: classes[className].score,
+                        grade: classes[className].grade,
+                    }));
+                });
+
                 setStudents(studentData);
             } catch (error) {
-                console.error('Öğrenci verilerini çekerken hata oluştu:', error);
+                console.error('Error fetching student data:', error);
             }
         };
 
         fetchStudents();
     }, []);
 
+    const filteredStudents = students.filter((item) =>
+        item.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.lastName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const renderTableHeader = () => (
+        <DataTable.Header>
+            <DataTable.Title>Name</DataTable.Title>
+            <DataTable.Title>Class</DataTable.Title>
+            <DataTable.Title>Score</DataTable.Title>
+            <DataTable.Title>Grade</DataTable.Title>
+            <DataTable.Title>DOB</DataTable.Title>
+        </DataTable.Header>
+    );
+
+    const renderTableRows = () =>
+        filteredStudents.map((item) => (
+            <DataTable.Row key={`${item.id}-${item.className}`}>
+                <DataTable.Cell>{`${item.firstName}\n${item.lastName}`}</DataTable.Cell>
+                <DataTable.Cell>{item.className}</DataTable.Cell>
+                <DataTable.Cell>{item.score}</DataTable.Cell>
+                <DataTable.Cell>{item.grade}</DataTable.Cell>
+                <DataTable.Cell>{item.dob}</DataTable.Cell>
+            </DataTable.Row>
+        ));
+
     return (
         <View style={styles.container}>
-            <Text style={styles.heading}>Öğrenci Listesi</Text>
-            <FlatList
-                data={students}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <View style={styles.itemContainer}>
-                        <Text>Class ID: {item.classID}</Text>
-                        <Text>First Name: {item.fName}</Text>
-                        <Text>Last Name: {item.lName}</Text>
-                        <Text>Birth Date: {item.DOB}</Text>
-                        <Text>Class Name: {item.className}</Text>
-                        <Text>Score: {item.score}</Text>
-                    </View>
-                )}
+            <Searchbar
+                placeholder="Search Students"
+                onChangeText={(text) => setSearchQuery(text)}
+                value={searchQuery}
+                style={styles.searchBar}
             />
+            <DataTable>{renderTableHeader()}{renderTableRows()}</DataTable>
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
-        marginHorizontal: 20,
-        backgroundColor: '#E6FFE6',
+        margin: 10,
         flex: 1,
-        justifyContent: 'center',
     },
-    heading: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#006400',
-    },
-    itemContainer: {
-        borderWidth: 1,
-        borderColor: '#006400',
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 10,
+    searchBar: {
+        marginTop: 10,
+        marginBottom: 20,
     },
 });
 
-
-
-export const Read = () => {
-    // code for Reading
-    // doc: https://firebase.google.com/docs/firestore/query-data/get-data?hl=en&authuser=0
-
-}
