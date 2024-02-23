@@ -1,89 +1,79 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { DataTable, Searchbar } from 'react-native-paper';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { FIREBASE_DB } from './firebaseConfig';
 
 export default function Read() {
-    const [students, setStudents] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [studentData, setStudentData] = useState([]);
 
     useEffect(() => {
-        const fetchStudents = async () => {
-            try {
-                const studentsRef = collection(FIREBASE_DB, 'Students');
-                const querySnapshot = await getDocs(studentsRef);
-                const studentData = querySnapshot.docs.flatMap((doc) => {
-                    const data = doc.data();
-                    const classes = data.Classes || {};
+        // Reference to the "Students" collection in Firestore
+        const studentsCollection = collection(FIREBASE_DB, 'Students');
 
-                    return Object.keys(classes).map((className) => ({
-                        id: doc.id,
-                        firstName: data.FirstName,
-                        lastName: data.LastName,
-                        dob: data.DOB,
-                        className: className,
-                        score: classes[className].score,
-                        grade: classes[className].grade,
+        // Fetch data from Firestore
+        const fetchData = async () => {
+            try {
+                const snapshot = await getDocs(studentsCollection);
+
+                const students = [];
+                snapshot.forEach((doc) => {
+                    const student = doc.data();
+                    // Convert Classes object into an array of classes
+                    const classes = Object.entries(student.Classes || {}).map(([classId, classData]) => ({
+                        id: classId,
+                        ...classData,
                     }));
+                    // Create a row for each class
+                    classes.forEach((classInfo) => {
+                        students.push({
+                            id: doc.id,
+                            FirstName: student.FirstName,
+                            LastName: student.LastName,
+                            DOB: student.DOB,
+                            ...classInfo,
+                        });
+                    });
                 });
 
-                setStudents(studentData);
+                setStudentData(students);
             } catch (error) {
-                console.error('Error fetching student data:', error);
+                console.error('Error fetching data:', error);
             }
         };
 
-        fetchStudents();
+        fetchData();
+
+        // Clean up function
+        return () => {
+            // Unsubscribe from any Firebase listeners or cleanup tasks if necessary
+        };
     }, []);
-
-    const filteredStudents = students.filter((item) =>
-        item.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.lastName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    const renderTableHeader = () => (
-        <DataTable.Header>
-            <DataTable.Title>Name</DataTable.Title>
-            <DataTable.Title>Class</DataTable.Title>
-            <DataTable.Title>Score</DataTable.Title>
-            <DataTable.Title>Grade</DataTable.Title>
-            <DataTable.Title>DOB</DataTable.Title>
-        </DataTable.Header>
-    );
-
-    const renderTableRows = () =>
-        filteredStudents.map((item) => (
-            <DataTable.Row key={`${item.id}-${item.className}`}>
-                <DataTable.Cell>{`${item.firstName}\n${item.lastName}`}</DataTable.Cell>
-                <DataTable.Cell>{item.className}</DataTable.Cell>
-                <DataTable.Cell>{item.score}</DataTable.Cell>
-                <DataTable.Cell>{item.grade}</DataTable.Cell>
-                <DataTable.Cell>{item.dob}</DataTable.Cell>
-            </DataTable.Row>
-        ));
 
     return (
         <View style={styles.container}>
-            <Searchbar
-                placeholder="Search Students"
-                onChangeText={(text) => setSearchQuery(text)}
-                value={searchQuery}
-                style={styles.searchBar}
+            <FlatList
+                data={studentData}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                    <View style={styles.row}>
+                        <Text>{`${item.FirstName} ${item.LastName}`}</Text>
+                        <Text>{`DOB: ${item.DOB}`}</Text>
+                        <Text>{`Class: ${item.className}`}</Text>
+                        <Text>{`Grade: ${item.grade}`}</Text>
+                        <Text>{`Score: ${item.score}`}</Text>
+                    </View>
+                )}
             />
-            <DataTable>{renderTableHeader()}{renderTableRows()}</DataTable>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        margin: 10,
         flex: 1,
+        padding: 16,
     },
-    searchBar: {
-        marginTop: 10,
-        marginBottom: 20,
+    row: {
+        marginBottom: 12,
     },
 });
-
