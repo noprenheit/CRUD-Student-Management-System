@@ -3,6 +3,7 @@ import { View, Button, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
 import Create from './CRUD/create';
 import Delete from './CRUD/delete';
+import Read from './CRUD/read';
 
 export default function App() {
     const [currentScreen, setCurrentScreen] = useState(null);
@@ -13,11 +14,14 @@ export default function App() {
                 return <Create />;
             case 'DeleteStudent':
                 return <Delete />;
+            case 'ReadStudent':
+                return <Read />;
             default:
                 return (
                     <View style={styles.container}>
                         <Button title="Create a Student" onPress={() => setCurrentScreen('CreateStudent')} />
                         <Button title="Delete a Student" onPress={() => setCurrentScreen('DeleteStudent')} />
+                        <Button title="Read a Student" onPress={() => setCurrentScreen('ReadStudent')} />
                     </View>
                 );
         }
