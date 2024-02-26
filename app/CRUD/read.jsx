@@ -2,28 +2,26 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { FIREBASE_DB } from './firebaseConfig';
+import { BarChartData } from "../../chart/chartdata";
+import { BarChart } from "react-native-chart-kit";
 
 export default function Read() {
     const [studentData, setStudentData] = useState([]);
+    const [isDataFetched, setIsDataFetched] = useState(false);
 
     useEffect(() => {
-        // Reference to the "Students" collection in Firestore
-        const studentsCollection = collection(FIREBASE_DB, 'Students');
-
-        // Fetch data from Firestore
         const fetchData = async () => {
             try {
+                const studentsCollection = collection(FIREBASE_DB, 'Students');
                 const snapshot = await getDocs(studentsCollection);
 
                 const students = [];
                 snapshot.forEach((doc) => {
                     const student = doc.data();
-                    // Convert Classes object into an array of classes
                     const classes = Object.entries(student.Classes || {}).map(([classId, classData]) => ({
                         id: classId,
                         ...classData,
                     }));
-                    // Create a row for each class
                     classes.forEach((classInfo) => {
                         students.push({
                             id: doc.id,
@@ -36,6 +34,8 @@ export default function Read() {
                 });
 
                 setStudentData(students);
+                setIsDataFetched(true);
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -43,10 +43,6 @@ export default function Read() {
 
         fetchData();
 
-        // Clean up function
-        return () => {
-            // Unsubscribe from any Firebase listeners or cleanup tasks if necessary
-        };
     }, []);
 
     return (
@@ -64,6 +60,22 @@ export default function Read() {
                     </View>
                 )}
             />
+
+            {isDataFetched && (
+                <BarChart
+                    data={BarChartData(studentData, "Mikrokontroller")}
+                    width={300} // Adjust the width as needed
+                    height={200} // Adjust the height as needed
+                    fromZero
+                    chartConfig={{
+                        backgroundGradientFrom: '#fff',
+                        backgroundGradientTo: '#fff',
+                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                        decimalPlaces: 0,
+                    }}
+                    style={{ marginVertical: 8, borderRadius: 16 }}
+                />
+            )}
         </View>
     );
 }
