@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { FIREBASE_DB } from './firebaseConfig';
-import { BarChartData } from "../../chart/chartdata";
-import { BarChart } from "react-native-chart-kit";
+import { Table, TableWrapper, Row, Rows } from 'react-native-table-component';
 
 export default function Read() {
     const [studentData, setStudentData] = useState([]);
-    const [isDataFetched, setIsDataFetched] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -34,58 +32,57 @@ export default function Read() {
                 });
 
                 setStudentData(students);
-                setIsDataFetched(true);
-
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
 
         fetchData();
-
+        console.log(studentData);
     }, []);
+    const widthArr = [40, 50, 50, 60, 80, 40, 40];
+    const tableHead = ['ID', 'First\nName', 'Last\nName', 'DOB', 'Class', 'Grade', 'Score'];
+    const tableData = studentData.map((item) => [
+        item.id,
+        item.FirstName,
+        item.LastName,
+        item.DOB,
+        item.className,
+        item.grade,
+        item.score,
+    ]);
 
     return (
         <View style={styles.container}>
-            <FlatList
-                data={studentData}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <View style={styles.row}>
-                        <Text>{`${item.FirstName} ${item.LastName}`}</Text>
-                        <Text>{`DOB: ${item.DOB}`}</Text>
-                        <Text>{`Class: ${item.className}`}</Text>
-                        <Text>{`Grade: ${item.grade}`}</Text>
-                        <Text>{`Score: ${item.score}`}</Text>
-                    </View>
-                )}
-            />
-
-            {isDataFetched && (
-                <BarChart
-                    data={BarChartData(studentData, "Mikrokontroller")}
-                    width={300} // Adjust the width as needed
-                    height={200} // Adjust the height as needed
-                    fromZero
-                    chartConfig={{
-                        backgroundGradientFrom: '#fff',
-                        backgroundGradientTo: '#fff',
-                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                        decimalPlaces: 0,
-                    }}
-                    style={{ marginVertical: 8, borderRadius: 16 }}
-                />
-            )}
+            <ScrollView horizontal={true}>
+                <View>
+                    <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
+                        <Row data={tableHead} widthArr={widthArr} style={styles.header} textStyle={styles.text}/>
+                    </Table>
+                    <ScrollView style={styles.dataWrapper}>
+                        <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
+                            {
+                                tableData.map((rowData, index) => (
+                                    <Row
+                                        key={index}
+                                        data={rowData}
+                                        widthArr={widthArr}
+                                        style={[styles.row, index%2 && {backgroundColor: '#F7F6E7'}]}
+                                        textStyle={styles.text}
+                                    />
+                                ))
+                            }
+                        </Table>
+                    </ScrollView>
+                </View>
+            </ScrollView>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-    },
-    row: {
-        marginBottom: 12,
-    },
+    container: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#fff' },
+    header: { height: 40, backgroundColor: '#808B97', justifyContent: 'center' },
+    text: {fontSize: 8, margin: 6, textAlign: 'center' },
+    row: { flexDirection: 'row', backgroundColor: '#FFF1C1' },
 });
