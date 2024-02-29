@@ -1,7 +1,8 @@
-import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
+import { View, TextInput, Button, Text, StyleSheet, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { addDoc, collection } from 'firebase/firestore';
 import { FIREBASE_DB } from './firebaseConfig';
+import {Link} from "expo-router";
 
 const Create = () => {
     const [classID, setClassID] = useState('');
@@ -13,88 +14,147 @@ const Create = () => {
 
     const addStudent = async () => {
         try {
-            const docRef = await addDoc(collection(FIREBASE_DB, 'Students'), { //Change here for different collection
-                classID: classID,
-                fName: fName,
-                lName: lName,
+            const docRef = await addDoc(collection(FIREBASE_DB, 'Students'), {
+                Classes: {
+                    [classID]: {
+                        className: className,
+                        grade: getGrade(score),
+                        score: parseInt(score),
+                    },
+                },
                 DOB: DOB,
-                className: className,
-                score: score,
+                FirstName: fName,
+                LastName: lName,
             });
             console.log('Document written successfully with ID: ', docRef.id);
+            Alert.alert('Success', 'Student added successfully!', [
+                { text: 'OK', onPress: () => console.log('OK Pressed') },
+            ]);
         } catch (e) {
             console.error('ERROR ', e);
+
+            Alert.alert('Error', 'Failed to add student. Please try again.', [
+                { text: 'OK', onPress: () => console.log('OK Pressed') },
+            ]);
         }
+    };
+
+    const getGrade = (score) => {
+        if (score >= 90) {
+            return 'A';
+        } else if (score >= 80) {
+            return 'B';
+        } else if (score >= 60) {
+            return 'C';
+        } else if (score >= 50) {
+            return 'D';
+        } else if (score >= 40) {
+            return 'E';
+        } else {
+            return 'F';
+        }
+    };
+
+    const exampleTexts = {
+        fName: 'Erik',
+        lName: 'Hansen',
+        DOB: '01/01/2000',
+        classID: 'IKT206',
+        className: 'DevOps',
+        score: '60',
     };
 
     return (
         <View style={styles.container}>
             <View style={styles.form}>
                 <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Class ID:</Text>
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={(text) => setClassID(text)}
-                        value={classID}
-                    />
-                </View>
-                <View style={styles.inputContainer}>
                     <Text style={styles.label}>First Name:</Text>
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={(text) => setFName(text)}
-                        value={fName}
-                    />
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={(text) => setFName(text)}
+                            value={fName}
+                        />
+                        {fName === '' && <Text style={styles.exampleText}>{exampleTexts.fName}</Text>}
+                    </View>
                 </View>
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>Last Name:</Text>
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={(text) => setLName(text)}
-                        value={lName}
-                    />
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={(text) => setLName(text)}
+                            value={lName}
+                        />
+                        {lName === '' && <Text style={styles.exampleText}>{exampleTexts.lName}</Text>}
+                    </View>
                 </View>
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>Birth Date:</Text>
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={(text) => setDOB(text)}
-                        value={DOB}
-                    />
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={(text) => setDOB(text)}
+                            value={DOB}
+                        />
+                        {DOB === '' && <Text style={styles.exampleText}>{exampleTexts.DOB}</Text>}
+                    </View>
+                </View>
+                <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Class ID:</Text>
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={(text) => setClassID(text)}
+                            value={classID}
+                        />
+                        {classID === '' && <Text style={styles.exampleText}>{exampleTexts.classID}</Text>}
+                    </View>
                 </View>
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>Class Name:</Text>
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={(text) => setClassName(text)}
-                        value={className}
-                    />
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={(text) => setClassName(text)}
+                            value={className}
+                        />
+                        {className === '' && <Text style={styles.exampleText}>{exampleTexts.className}</Text>}
+                    </View>
                 </View>
                 <View style={styles.inputContainer}>
                     <Text style={styles.label}>Score:</Text>
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={(text) => setScore(text)}
-                        value={score}
-                    />
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={(text) => setScore(text)}
+                            value={score}
+                            keyboardType="numeric"
+                        />
+                        {score === '' && <Text style={styles.exampleText}>{exampleTexts.score}</Text>}
+                    </View>
                 </View>
-                <Button onPress={addStudent} title="Add Student" disabled={classID === '' || fName === '' || lName === '' || DOB === '' || className === '' || score === ''} />
+                <Button
+                    onPress={addStudent}
+                    title="Add Student"
+                    disabled={
+                        classID === '' || fName === '' || lName === '' || DOB === '' || className === '' || score === ''
+                    }
+                />
+                <Link href="CRUD/AddClass">Add Class to Student</Link>
             </View>
         </View>
     );
 };
-//LINE 81: Add student button does not active until all the boxes filled.
 
 const styles = StyleSheet.create({
     container: {
-        marginHorizontal: 20,
-        backgroundColor: '#E6FFE6',
         flex: 1,
+        backgroundColor: '#fff',
     },
     form: {
-        marginVertical: 20,
-        flexDirection: 'column',
-        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
     },
     inputContainer: {
         flexDirection: 'row',
@@ -102,20 +162,32 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     label: {
+        width: '40%', // Set a fixed width for the labels (40% of the screen width)
         marginRight: 10,
         fontSize: 16,
         color: '#006400',
     },
     input: {
-        flex: 1,
-        height: 40,
+        flex: 1, // Take up the remaining space
+        width: '60%', // Set the input width to 60% of the screen width
         borderWidth: 1,
-        borderRadius: 4,
-        padding: 10,
-        backgroundColor: '#fff',
+        borderColor: '#ccc',
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        marginBottom: 8,
+    },
+    inputWrapper: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        position: 'relative',
+    },
+    exampleText: {
+        position: 'absolute',
+        left: 10, // Adjust the left position as needed
+        color: '#aaa', // Adjust the color as needed
     },
 });
 
-export default Create; //export for possible future imports
-
-
+export default Create;
