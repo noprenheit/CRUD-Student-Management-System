@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Button, Alert } from 'react-native';
-import { collection, query, where, getDocs, doc, updateDoc, deleteField  } from 'firebase/firestore';
-import { FIREBASE_DB } from './firebaseConfig';
+import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Button, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { FIREBASE_DB } from './firebaseConfig';
+import {Link} from "expo-router";
 
-export default function DeleteClass() {
+export default function AddClass() {
     const [searchText, setSearchText] = useState('');
     const [students, setStudents] = useState([]);
     const [selectedStudentId, setSelectedStudentId] = useState(null);
-    const [selectedClassId, setSelectedClassId] = useState('');
+    const [newClassId, setNewClassId] = useState('');
+    const [newClassName, setNewClassName] = useState('');
+    const [score, setScore] = useState('');
 
     useEffect(() => {
         if (!searchText.trim()) {
@@ -34,34 +37,61 @@ export default function DeleteClass() {
         return () => clearTimeout(timeoutId);
     }, [searchText]);
 
-    const deleteClass = async () => {
+    const selectStudent = (student) => {
+        setSelectedStudentId(student.id);
+        setStudents([]);
+        setSearchText('');
+    };
+
+    const addClass = async () => {
         try {
-            if (selectedStudentId && selectedClassId !== '') {
+            if (selectedStudentId && newClassId !== '' && newClassName !== '' && score !== '') {
                 const studentDocRef = doc(FIREBASE_DB, 'Students', selectedStudentId);
 
-                // Update the document to delete the specified class ID field
                 await updateDoc(studentDocRef, {
-                    [`Classes.${selectedClassId}`]: deleteField(),
+                    [`Classes.${newClassId}`]: {
+                        className: newClassName.trim(),
+                        grade: getGrade(parseInt(score, 10)),
+                        score: parseInt(score, 10),
+                    },
                 });
 
-                Alert.alert('Success', 'Class deleted successfully!', [
+                Alert.alert('Success', 'Class added successfully!', [
                     { text: 'OK', onPress: () => resetForm() },
                 ]);
             } else {
-                Alert.alert('Error', 'Please select a valid class to delete.');
+                Alert.alert('Error', 'Please enter a valid class ID, class name, and score.');
             }
         } catch (error) {
             console.error('ERROR ', error);
 
-            Alert.alert('Error', 'Failed to delete class. Please try again.', [
+            Alert.alert('Error', 'Failed to add class. Please try again.', [
                 { text: 'OK', onPress: () => console.log('OK Pressed') },
             ]);
         }
     };
 
+    const getGrade = (score) => {
+        if (score >= 90) {
+            return 'A';
+        } else if (score >= 80) {
+            return 'B';
+        } else if (score >= 60) {
+            return 'C';
+        } else if (score >= 50) {
+            return 'D';
+        } else if (score >= 40) {
+            return 'E';
+        } else {
+            return 'F';
+        }
+    };
+
     const resetForm = () => {
         setSelectedStudentId(null);
-        setSelectedClassId('');
+        setNewClassId('');
+        setNewClassName('');
+        setScore('');
     };
 
     return (
@@ -82,7 +112,7 @@ export default function DeleteClass() {
                         {students.map((student) => (
                             <View key={student.id}>
                                 <Text>{`${student.FirstName} ${student.LastName}`}</Text>
-                                <Button title="Select" onPress={() => setSelectedStudentId(student.id)} />
+                                <Button title="Select" onPress={() => selectStudent(student)} />
                             </View>
                         ))}
                     </View>
@@ -98,34 +128,42 @@ export default function DeleteClass() {
                             />
                         </View>
                         <View style={styles.inputContainer}>
-                            <Text style={styles.label}>Class ID to delete:</Text>
-                            <Picker
-                                selectedValue={selectedClassId}
-                                onValueChange={(itemValue) => setSelectedClassId(itemValue)}
-                            >
-                                <Picker.Item label="Select Class" value="" />
-                                {/* Map over the classes of the selected student */}
-                                {students
-                                        .find((student) => student.id === selectedStudentId)
-                                        .Classes &&
-                                    Object.keys(
-                                        students.find((student) => student.id === selectedStudentId).Classes
-                                    ).map((classId) => (
-                                        <Picker.Item key={classId} label={classId} value={classId} />
-                                    ))}
-                            </Picker>
+                            <Text style={styles.label}>Class ID:</Text>
+                            <TextInput
+                                style={styles.input}
+                                onChangeText={(text) => setNewClassId(text)}
+                                value={newClassId}
+                            />
+                        </View>
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.label}>Class Name:</Text>
+                            <TextInput
+                                style={styles.input}
+                                onChangeText={(text) => setNewClassName(text)}
+                                value={newClassName}
+                            />
+                        </View>
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.label}>Score:</Text>
+                            <TextInput
+                                style={styles.input}
+                                onChangeText={(text) => setScore(text)}
+                                value={score}
+                                keyboardType="numeric"
+                            />
                         </View>
                         <Button
-                            onPress={deleteClass}
-                            title="Delete Class"
-                            disabled={selectedClassId === ''}
+                            onPress={addClass}
+                            title="Add Class"
+                            disabled={newClassId === '' || newClassName === '' || score === ''}
                         />
                     </View>
                 )}
+                <Link href="/">Back</Link>
             </View>
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -156,5 +194,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 8,
         marginBottom: 8,
+    },
+    exampleText: {
+        position: 'absolute',
+        left: 10, // Adjust the left position as needed
+        color: '#aaa', // Adjust the color as needed
     },
 });

@@ -11,7 +11,6 @@ export default function SearchAndUpdate() {
     const [selectedStudentId, setSelectedStudentId] = useState(null);
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [selectedClassId, setSelectedClassId] = useState('');
-    const [grade, setGrade] = useState('');
     const [score, setScore] = useState('');
 
     useEffect(() => {
@@ -44,12 +43,28 @@ export default function SearchAndUpdate() {
         setSelectedClassId('');
     };
 
+    const getGrade = (score) => {
+        if (score >= 90) {
+            return 'A';
+        } else if (score >= 80) {
+            return 'B';
+        } else if (score >= 60) {
+            return 'C';
+        } else if (score >= 50) {
+            return 'D';
+        } else if (score >= 40) {
+            return 'E';
+        } else {
+            return 'F';
+        }
+    };
+
     const handleUpdate = async () => {
         if (selectedStudentId && selectedClassId) {
             const studentDocRef = doc(FIREBASE_DB, 'Students', selectedStudentId);
             try {
                 await updateDoc(studentDocRef, {
-                    [`Classes.${selectedClassId}.grade`]: grade,
+                    [`Classes.${selectedClassId}.grade`]: getGrade(score),
                     [`Classes.${selectedClassId}.score`]: parseInt(score, 10)
                 });
                 Alert.alert("Success", "Class successfully updated!", [
@@ -66,7 +81,6 @@ export default function SearchAndUpdate() {
         setSelectedStudent(null);
         setSelectedStudentId(null);
         setSelectedClassId('');
-        setGrade('');
         setScore('');
         setSearchText('');
         setStudents([]);
@@ -112,12 +126,6 @@ export default function SearchAndUpdate() {
                         </Picker>
                         {selectedClassId && (
                             <View>
-                                <TextInput
-                                    style={styles.input}
-                                    value={grade}
-                                    onChangeText={setGrade}
-                                    placeholder="Grade"
-                                />
                                 <TextInput
                                     style={styles.input}
                                     value={score}
