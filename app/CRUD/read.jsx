@@ -76,7 +76,6 @@ export default function Read() {
             strokeWidth: "2",
             stroke: "#ffa726"
         },
-        formatYLabel: value => Math.round(value),
     };
 
     const graphStyle = {
@@ -115,11 +114,11 @@ export default function Read() {
                         <>
                             {/* Dropdown to select class */}
                             <View style={styles.pickerContainer}>
-                                <Text>Select Class: </Text>
                                 <Picker
                                     selectedValue={selectedClass}
                                     onValueChange={(itemValue) => setSelectedClass(itemValue)}
                                     style={styles.picker}
+                                    itemStyle={styles.pickerItem}
                                 >
                                     <Picker.Item label="Select a class" value="" />
                                     {uniqueClassNames.map((className, index) => (
@@ -149,10 +148,26 @@ export default function Read() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#fff' },
-    header: { height: 40, backgroundColor: '#808B97', justifyContent: 'center' },
-    text: { fontSize: 8, margin: 6, textAlign: 'center' },
-    row: { flexDirection: 'row', backgroundColor: '#FFF1C1' },
+    container: {
+        flex: 1,
+        padding: 16,
+        paddingTop: 30,
+        backgroundColor: '#fff'
+    },
+    header: {
+        height: 40,
+        backgroundColor: '#808B97',
+        justifyContent: 'center'
+    },
+    text: {
+        fontSize: 8,
+        margin: 6,
+        textAlign: 'center'
+    },
+    row: {
+        flexDirection: 'row',
+        backgroundColor: '#FFF1C1'
+    },
     button: {
         backgroundColor: '#4CAF50',
         padding: 10,
@@ -165,12 +180,23 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     pickerContainer: {
+        height: '20%',
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 10,
+        paddingHorizontal: 2,
+        paddingVertical: 2,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 2,
+        marginBottom: 2,
+        fontSize: 12,
     },
     picker: {
-        height: 50,
-        width: 150,
+        flex: 1,
+    },
+    pickerItem: {
+        fontSize: 12,
     },
 });
+
+

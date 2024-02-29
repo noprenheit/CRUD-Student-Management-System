@@ -97,17 +97,18 @@ export default function DeleteClass() {
                                 editable={false}
                             />
                         </View>
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.label}>Class ID to delete:</Text>
+                        <View style={styles.pickerContainer}>
                             <Picker
                                 selectedValue={selectedClassId}
                                 onValueChange={(itemValue) => setSelectedClassId(itemValue)}
+                                style={styles.picker}
+                                itemStyle={styles.pickerItem}
                             >
                                 <Picker.Item label="Select Class" value="" />
                                 {/* Map over the classes of the selected student */}
                                 {students
                                         .find((student) => student.id === selectedStudentId)
-                                        .Classes &&
+                                        ?.Classes &&
                                     Object.keys(
                                         students.find((student) => student.id === selectedStudentId).Classes
                                     ).map((classId) => (
@@ -115,11 +116,13 @@ export default function DeleteClass() {
                                     ))}
                             </Picker>
                         </View>
-                        <Button
-                            onPress={deleteClass}
-                            title="Delete Class"
-                            disabled={selectedClassId === ''}
-                        />
+                        <View style={styles.deleteButtonContainer}>
+                            <Button
+                                onPress={deleteClass}
+                                title="Delete Class"
+                                disabled={selectedClassId === ''}
+                            />
+                        </View>
                     </View>
                 )}
             </View>
@@ -156,5 +159,28 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 8,
         marginBottom: 8,
+    },
+    pickerContainer: {
+        height: '40%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 2,
+        paddingVertical: 2,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 2,
+        marginBottom: 2,
+        fontSize: 12,
+    },
+    picker: {
+        flex: 1,
+    },
+    pickerItem: {
+        fontSize: 25,
+    },
+    deleteButtonContainer: {
+        flex: 1,
+        justifyContent: 'end',
+        marginBottom: 20,
     },
 });
