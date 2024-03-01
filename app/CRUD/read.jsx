@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { Dropdown } from 'react-native-element-dropdown';
 import { collection, getDocs } from 'firebase/firestore';
 import { FIREBASE_DB } from './firebaseConfig';
 import { Table, Row } from 'react-native-table-component';
@@ -59,6 +60,11 @@ export default function Read() {
 
     const uniqueClassNames = [...new Set(studentData.map(item => item.className))];
 
+    const uniqueClassNamesData = [...uniqueClassNames].map((className, index) => ({
+        label: className,
+        value: className,
+    }));
+
     const screenWidth = 300;
     const chartConfig = {
         backgroundGradientFrom: '#fff',
@@ -114,17 +120,36 @@ export default function Read() {
                         <>
                             {/* Dropdown to select class */}
                             <View style={styles.pickerContainer}>
-                                <Picker
-                                    selectedValue={selectedClass}
-                                    onValueChange={(itemValue) => setSelectedClass(itemValue)}
-                                    style={styles.picker}
-                                    itemStyle={styles.pickerItem}
-                                >
-                                    <Picker.Item label="Select a class" value="" />
-                                    {uniqueClassNames.map((className, index) => (
-                                        <Picker.Item key={index} label={className} value={className} />
-                                    ))}
-                                </Picker>
+                                {Platform.OS === 'android' ? ( // Use DropDownPicker for Android
+                                    <Dropdown
+                                        style={styles.dropdown}
+                                        placeholderStyle={styles.placeholderStyle}
+                                        selectedTextStyle={styles.selectedTextStyle}
+                                        inputSearchStyle={styles.inputSearchStyle}
+                                        data={uniqueClassNamesData}
+                                        search
+                                        maxHeight={300}
+                                        labelField="label"
+                                        valueField="value"
+                                        placeholder="Select Class"
+                                        searchPlaceholder="Search..."
+                                        onChange={item => {
+                                            setSelectedClass(item.value);
+                                        }}
+                                    />
+                                ) : ( // Use Picker for iOS and web
+                                    <Picker
+                                        selectedValue={selectedClass}
+                                        onValueChange={(itemValue) => setSelectedClass(itemValue)}
+                                        style={styles.picker}
+                                        itemStyle={styles.pickerItem}
+                                    >
+                                        <Picker.Item label="Select a class" value="" />
+                                        {uniqueClassNames.map((className, index) => (
+                                            <Picker.Item key={index} label={className} value={className} />
+                                        ))}
+                                    </Picker>
+                                )}
                             </View>
 
                             {/* BarChart */}
@@ -146,7 +171,6 @@ export default function Read() {
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -186,16 +210,34 @@ const styles = StyleSheet.create({
         paddingHorizontal: 2,
         paddingVertical: 2,
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: '#000000',
         borderRadius: 2,
         marginBottom: 2,
         fontSize: 12,
+        color: "#000000"
     },
     picker: {
         flex: 1,
     },
     pickerItem: {
         fontSize: 12,
+        color: Platform.OS === 'ios' ? '#000000' : '#000000',
+    },
+    dropdown: {
+        margin: 16,
+        height: 50,
+        borderBottomColor: 'gray',
+        borderBottomWidth: 0.5,
+    },
+    placeholderStyle: {
+        fontSize: 16,
+    },
+    selectedTextStyle: {
+        fontSize: 16,
+    },
+    inputSearchStyle: {
+        height: 40,
+        fontSize: 16,
     },
 });
 

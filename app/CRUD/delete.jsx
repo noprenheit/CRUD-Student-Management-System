@@ -1,14 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Button, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Button, Alert, TouchableOpacity, FlatList, Platform } from 'react-native';
 import { collection, query, where, getDocs, doc, updateDoc, deleteField  } from 'firebase/firestore';
 import { FIREBASE_DB } from './firebaseConfig';
 import { Picker } from '@react-native-picker/picker';
+import {Dropdown} from "react-native-element-dropdown";
 
 export default function DeleteClass() {
     const [searchText, setSearchText] = useState('');
     const [students, setStudents] = useState([]);
     const [selectedStudentId, setSelectedStudentId] = useState(null);
     const [selectedClassId, setSelectedClassId] = useState('');
+    const [data, setData] = useState([]);
+
+
+    const selectStudent = (student) => {
+        setSelectedStudentId(student.id);
+        setSearchText('')
+
+        const newData = Object.keys(student.Classes || {}).map((classId) => ({
+            label: classId,
+            value: classId,
+        }));
+        setData(newData);
+        console.log(newData);
+    };
 
     useEffect(() => {
         if (!searchText.trim()) {
@@ -79,12 +94,15 @@ export default function DeleteClass() {
                 {students.length > 0 && (
                     <View>
                         <Text>Select a student:</Text>
-                        {students.map((student) => (
-                            <View key={student.id}>
-                                <Text>{`${student.FirstName} ${student.LastName}`}</Text>
-                                <Button title="Select" onPress={() => setSelectedStudentId(student.id)} />
-                            </View>
-                        ))}
+                        <FlatList
+                            data={students}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity onPress={() => { selectStudent(item); setSelectedStudentId(item.id); }} style={styles.listItem}>
+                                    <Text>{`${item.FirstName} ${item.LastName}`}</Text>
+                                </TouchableOpacity>
+                            )}
+                        />
                     </View>
                 )}
                 {selectedStudentId && (
@@ -97,7 +115,28 @@ export default function DeleteClass() {
                                 editable={false}
                             />
                         </View>
-                        <View style={styles.pickerContainer}>
+
+                            {Platform.OS === 'android' ? ( // Use Dropdown for Android
+                                <View style={styles.DropdownContainer}>
+                                <Dropdown
+                                    style={styles.dropdown}
+                                    placeholderStyle={styles.placeholderStyle}
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    data={data}
+                                    search
+                                    maxHeight={300}
+                                    labelField="label"
+                                    valueField="value"
+                                    placeholder="Select Class"
+                                    searchPlaceholder="Search..."
+                                    onChange={item => {
+                                        setSelectedClassId(item.value);
+                                    }}
+                                />
+                                    </View>
+                            ) : (
+                                <View style={styles.pickerContainer}>
                             <Picker
                                 selectedValue={selectedClassId}
                                 onValueChange={(itemValue) => setSelectedClassId(itemValue)}
@@ -115,8 +154,10 @@ export default function DeleteClass() {
                                         <Picker.Item key={classId} label={classId} value={classId} />
                                     ))}
                             </Picker>
-                        </View>
-                        <View style={styles.deleteButtonContainer}>
+                                </View>
+                            )}
+
+                        <View>
                             <Button
                                 onPress={deleteClass}
                                 title="Delete Class"
@@ -179,8 +220,31 @@ const styles = StyleSheet.create({
         fontSize: 25,
     },
     deleteButtonContainer: {
-        flex: 1,
         justifyContent: 'end',
-        marginBottom: 20,
+        padding: 20,
+        margin: 20,
     },
+    dropdown: {
+        margin: 16,
+        height: 50,
+        borderBottomColor: 'gray',
+        borderBottomWidth: 0.5,
+    },
+    placeholderStyle: {
+        fontSize: 16,
+    },
+    selectedTextStyle: {
+        fontSize: 16,
+    },
+    inputSearchStyle: {
+        height: 40,
+        fontSize: 16,
+    },
+    DropdownContainer: {
+        backgroundColor: 'white',
+        padding: 16,
+        marginBottom: 2,
+    },
+
+
 });

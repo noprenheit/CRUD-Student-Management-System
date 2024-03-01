@@ -61,7 +61,7 @@ const Create = () => {
         DOB: '01/01/2000',
         classID: 'IKT206',
         className: 'DevOps',
-        score: '60',
+        score: '0-100',
     };
 
     return (
@@ -141,7 +141,9 @@ const Create = () => {
                         classID === '' || fName === '' || lName === '' || DOB === '' || className === '' || score === ''
                     }
                 />
-                <Link href="CRUD/AddClass">Add Class to Student</Link>
+                <Link href="CRUD/AddClass" style={{ backgroundColor: 'lightblue', padding: 10, borderRadius: 5 }}>
+                    <Text style={{ fontWeight: 'bold', color: 'black', fontSize: 30 }}>Add a Student to a Class</Text>
+                </Link>
             </View>
         </View>
     );
@@ -187,6 +189,22 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 10, // Adjust the left position as needed
         color: '#aaa', // Adjust the color as needed
+    },
+    dropdown: {
+        margin: 16,
+        height: 50,
+        borderBottomColor: 'gray',
+        borderBottomWidth: 0.5,
+    },
+    placeholderStyle: {
+        fontSize: 16,
+    },
+    selectedTextStyle: {
+        fontSize: 16,
+    },
+    inputSearchStyle: {
+        height: 40,
+        fontSize: 16,
     },
 });
 
