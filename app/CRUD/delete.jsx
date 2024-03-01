@@ -201,6 +201,11 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         marginBottom: 8,
     },
+    listItem: {
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+    },
     pickerContainer: {
         height: '40%',
         flexDirection: 'row',

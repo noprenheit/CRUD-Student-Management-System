@@ -141,7 +141,7 @@ const Create = () => {
                         classID === '' || fName === '' || lName === '' || DOB === '' || className === '' || score === ''
                     }
                 />
-                <Link href="CRUD/AddClass" style={{ backgroundColor: 'lightblue', padding: 10, borderRadius: 5 }}>
+                <Link href="CRUD/AddClass" style={{ backgroundColor: 'lightblue', padding: 10, marginTop:20 ,borderRadius: 5 }}>
                     <Text style={{ fontWeight: 'bold', color: 'black', fontSize: 30 }}>Add a Student to a Class</Text>
                 </Link>
             </View>

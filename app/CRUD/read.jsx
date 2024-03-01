@@ -119,7 +119,7 @@ export default function Read() {
                     {showChart && (
                         <>
                             {/* Dropdown to select class */}
-                            <View style={styles.pickerContainer}>
+
                                 {Platform.OS === 'android' ? ( // Use DropDownPicker for Android
                                     <Dropdown
                                         style={styles.dropdown}
@@ -138,6 +138,7 @@ export default function Read() {
                                         }}
                                     />
                                 ) : ( // Use Picker for iOS and web
+                                    <View style={styles.pickerContainer}>
                                     <Picker
                                         selectedValue={selectedClass}
                                         onValueChange={(itemValue) => setSelectedClass(itemValue)}
@@ -149,8 +150,9 @@ export default function Read() {
                                             <Picker.Item key={index} label={className} value={className} />
                                         ))}
                                     </Picker>
+                                    </View>
                                 )}
-                            </View>
+
 
                             {/* BarChart */}
                             {selectedClass && (
