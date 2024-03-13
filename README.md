@@ -13,7 +13,7 @@ Add a Student to a Class:
 It is a button that appears down on the 'Create a Student' page. When users click it, a new page opens, and users can see a search bar for student names. So basically, it is just a faster method for providing samples. When a student is added to the database using 'create a student' method, users can open 'add a student to a class' page, and then search for the student's name, click the select button that appears, and then users can add that selected student to different classes without typing his/her first name, last name, dob.
 
 Delete a Student:
-It is the second page. It has the purpose of deleting a student from a class. Open the page, search for a student, and click the select button. A 'selected student ID' appears. Below that, users can see the different classes of selected the student, and simply selecting a class, then 'delete class' button does what it has to do.
+It is the second page. It has the purpose of deleting a student from a class. Open the page, search for a student, and click the select button. A 'selected student ID' appears. Below that, users can see the different classes of selected student, and simply selecting a class, then 'delete class' button does what it has to do.
 
 Read a Student:
 This is the third and main page for an overview of what we have on the database. We chose to use contrasting colors for better visibility. There is a clickable dropdown menu saying 'Show Chart'. Then users can select a class, then they can see the distribution of grades of the selected class. Users can navigate between classes, so it is a fast and easy method of looking grade charts of each class. It is possible to toggle charts using the 'hide chart' option.
