@@ -1,22 +1,18 @@
-IKT205-G 24V Applikasjonsutvikling
+# CRUD App for Student Management System
 
-Group 2 :
-Mehmet Selcuk Oner - Mehmet Akif Gultekin - Seyma Dogdu - Omer Cetinkaya - Ahmet Kurcak - Nurdan Kurcak
+## Features
 
---------------------------------------------------------------------------------------------------------------------------------------------------------
+### Creating a Student
+On the first page, users can easily fill in the necessary details to create a new student profile. With sample text as a guide, users can quickly enter information and hit the **'Add Student'** button to save everything directly to the database. The system automatically calculates the student's grade based on their scores, so there’s no need to input grades manually.
 
-Create a Student :
-It is the first page. Users can provide needed information about a student, and then directly save it to the database. We provided text holders for example inputs. 'Add Student' button below, saves the data to 'Students' collection on the database. This is essential for further testing, although we have some students on the database.
-Note: We are using a function that automatically calculates grades from scores. There is no need to type any grade input.
+### Adding a Student to a Class
+Once a student has been created, assigning them to classes is seamless. At the bottom of the 'Create a Student' page, users will find a button that takes them to a page with a search bar. Users can search for the student by name, select the student, and add them to any class without having to re-enter details like their name or date of birth. This makes the process fast and hassle-free.
 
-Add a Student to a Class:
-It is a button that appears down on the 'Create a Student' page. When users click it, a new page opens, and users can see a search bar for student names. So basically, it is just a faster method for providing samples. When a student is added to the database using 'create a student' method, users can open 'add a student to a class' page, and then search for the student's name, click the select button that appears, and then users can add that selected student to different classes without typing his/her first name, last name, dob.
+### Deleting a Student
+To remove a student from a class, navigate to the second page. Here, users can search for the student, select their ID, and see all the classes they’re part of. From there, simply select the relevant class and click the **'Delete Class'** button to remove them from that specific class.
 
-Delete a Student:
-It is the second page. It has the purpose of deleting a student from a class. Open the page, search for a student, and click the select button. A 'selected student ID' appears. Below that, users can see the different classes of selected student, and simply selecting a class, then 'delete class' button does what it has to do.
+### Viewing a Student’s Data
+The third page offers an overview of the student data in the database, with easy-to-read visuals. Users can use the **'Show Chart'** dropdown menu to select a class and view a grade distribution chart. This feature allows users to quickly toggle between classes for a fast and effective way to analyze performance. There’s also a **'Hide Chart'** option to turn off the chart if it’s not needed.
 
-Read a Student:
-This is the third and main page for an overview of what we have on the database. We chose to use contrasting colors for better visibility. There is a clickable dropdown menu saying 'Show Chart'. Then users can select a class, then they can see the distribution of grades of the selected class. Users can navigate between classes, so it is a fast and easy method of looking grade charts of each class. It is possible to toggle charts using the 'hide chart' option.
-
-Update a Student:
-This is the fourth and last page. It updates selected students selected class's grades. Open the page, search for a student, click the name of the student, select a class to update from the list, type new score, and click the 'update' button. Pretty straightforward.
+### Updating a Student's Grades
+On the last page, users can update a student’s grades with just a few clicks. After searching for the student and selecting their name, users can choose a class from the list, enter the new score, and click the **'Update'** button to save the changes. The process is designed to be straightforward and user-friendly.
